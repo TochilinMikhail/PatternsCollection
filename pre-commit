@@ -1,0 +1,15 @@
+#!/bin/bash
+
+TRESHHOLD=9
+files_to_change=$(git diff --diff-filter=d --cached --name-only | grep -E '^*.py')
+
+echo $files_to_change | while read f;
+do
+  score=`python -m pylint $f | tail -2 | sed -E 's|^([^.]+).*$|\1|; s|^[^0-9]*([0-9]+).*$|\1|'`
+  if (( $TRESHHOLD > $score));
+  then
+    echo "Current score: $score"
+    exit 1
+  fi
+
+done
